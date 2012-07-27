@@ -1,0 +1,68 @@
+# -*- mode: org; -*-
+
+* Download
+
+run the following commands to get basic files. about the dictionaries, most of
+the linux distributions seems updated versions, you may want to use those.
+#+BEGIN_SRC sh
+wget http://namazu.org/~tsuchiya/sdic/sdic-2.1.3.tar.gz
+wget http://www.namazu.org/~tsuchiya/sdic/data/gene95.tar.gz
+wget http://www.namazu.org/~tsuchiya/sdic/data/edict.gz
+#+END_SRC
+
+* build sdic
+;; building.
+emacs -batch -q -l install.el -f make-sdic --with-lispdir=$(pwd) --with-dictdir=$(pwd) \
+--infodir=$(pwd)
+
+* build sdic files from ejiro (Optional)
+cat EIJI-126.TXT RYAKU126.TXT | nkf -w8| perl contrib/eijirou.perl --compat > eijirou126.sdic
+cat WAEI-126.TXT | nkf -w8| perl contrib/eijirou.perl --compat > waei-126.sdic
+* emacs init excerpt
+#+BEGIN_SRC emacs-lisp
+  ;;; sdic-mode 用の設定
+  (setq load-path (cons "/home/yagnesh/git/sdic/" load-path ))
+  (require 'sdic)
+  (autoload 'sdic-describe-word "sdic" "英単語の意味を調べる" t nil)
+  (autoload 'sdic-describe-word-at-point "sdic" "カーソルの位置の英単語の意味を調べる" t nil)
+  (global-set-key "\C-cw" 'sdic-describe-word)
+  (global-set-key "\C-cW" 'sdic-describe-word-at-point)
+  (setq sdic-eiwa-dictionary-list '((sdicf-client "/home/yagnesh/git/sdic/gene.sdic")))
+  (setq sdic-waei-dictionary-list '((sdicf-client "/home/yagnesh/git/sdic/edict.sdic")))
+  (setq sdic-default-coding-system 'utf-8-unix)
+#+END_SRC
+
+* Ejirou dictionary setup
+ [[http://www.amazon.co.jp/exec/obidos/ASIN/4757414560/higepon-22][Ejirou]] dictionaries are huge but non-free., if have them you can use them as
+ sdic. To make eijirou dictionaries into sdic format. follow the instructions.
+
+** Install dependencies
+#+BEGIN_SRC bash
+sudo apt-get install nkf
+#+END_SRC
+
+** build ejirou to sdic
+- copy the files from the folder
+- convert them in sdic file format using the script pdic1line2sdic.rb
+EDIT better use perl script in contrib/
+
+#+BEGIN_SRC bash
+nkf -S -e EIJI-126.TXT RYAKU126.TXT | contrib/eijirou.perl > eiji-126.sdic
+nkf -S -e WAEI-126.TXT | contrib/eijirou.perl > waeiji-126.sdic
+#+END_SRC
+
+** add them in the sdic search alist
+
+#+BEGIN_SRC emacs-lisp
+  (setq sdic-eiwa-dictionary-list
+        '((sdicf-client "/home/yagnesh/git/sdic/gene.sdic")
+          (sdicf-client "/home/yagnesh/git/sdic/eiji-126.sdic")))
+  (setq sdic-waei-dictionary-list
+        '((sdicf-client "/home/yagnesh/git/sdic/edict.sdic")
+          (sdicf-client "/home/yagnesh/git/sdic/waeiji-126.sdic"
+                        (add-keys-to-headword t))))
+#+END_SRC
+
+
+* Resources
+http://d.hatena.ne.jp/eiel/20090111#1231681381

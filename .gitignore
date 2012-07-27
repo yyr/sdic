@@ -7,3 +7,7 @@ autom4te.cache/*
 config.status
 configure
 el
+
+# just to make sure not to add non-free stuff into repository
+dicts/eij*.sdic
+dicts/waeiji*.sdic
