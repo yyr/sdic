@@ -11,3 +11,14 @@ el
 # just to make sure not to add non-free stuff into repository
 dicts/eij*.sdic
 dicts/waeiji*.sdic
+/elisp-comp
+/install.el
+/lisp/sample.emacs
+/lisp/sdic.el
+/sdic-compat.el
+/sdic-gene.el
+/sdic.el
+/sdicf-client.el
+/sdicf.el
+/src/gene.txt
+/stem.el
